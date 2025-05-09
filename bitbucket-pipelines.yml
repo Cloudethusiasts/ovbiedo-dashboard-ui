@@ -1,0 +1,30 @@
+# bitbucket-pipelines.yml
+definitions:
+  services:
+    push-image: &push-image
+      name: Build and Push Docker Image
+      image: atlassian/pipelines-awscli
+      caches:
+        - docker
+      services:
+        - docker
+      script:
+        # Login to Docker registry on AWS
+        - aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 743487631281.dkr.ecr.us-west-2.amazonaws.com/ovb-dashboard-ui-repo
+        - apt-get update && apt-get install -y wget
+
+        
+        
+        - docker build -t 743487631281.dkr.ecr.us-west-2.amazonaws.com/ovb-dashboard-ui-repo . --no-cache
+        # Push image to private registry
+        - docker push 743487631281.dkr.ecr.us-west-2.amazonaws.com/ovb-dashboard-ui-repo:latest
+
+
+pipelines:
+  branches:
+    #master:
+      #- step: *push-image
+    #Development:
+      #- step: *push-image
+    development:
+      - step: *push-image
